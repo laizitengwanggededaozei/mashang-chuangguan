@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaQuest v2 · 编程闯关</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar">
+    <div class="logo">☕ JavaQuest <span style="font-size:11px;color:var(--dim)">v2</span></div>
+    <div id="player-hud"></div>
+    <nav>
+      <button data-view="map" class="active">🗺 关卡地图</button>
+      <button data-view="route">🧭 知识体系</button>
+      <button data-view="bag">🎒 战绩</button>
+      <button id="btn-reset">🔄 重开</button>
+    </nav>
+  </header>
+  <main id="stage"><div class="card">正在连接评测服务...</div></main>
+  <footer>每关均为真编程题 · 提交后由本机 JDK 编译评测(公开样例 + 隐藏用例 + 随机对拍) · 进度存于浏览器</footer>
+  <script src="js/api.js"></script>
+  <script src="js/engine2.js"></script>
+  <script src="js/ui2.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# 依赖与构建产物(本项目无构建步骤, 仅判题时会生成临时编译目录)
+node_modules/
+dist/
+build/
+
+# 判题内核运行时的临时编译目录/结果文件
+_probe/
+jq-tmp/
+*.class
+*.jar
+
+# 编辑器与系统文件
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# 本地日志
+*.log
+npm-debug.log*
