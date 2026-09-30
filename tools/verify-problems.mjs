@@ -39,6 +39,14 @@ for (const p of levels) {
   if (!p.solution || !p.solution.includes('class Main')) err.push('solution 缺 class Main');
   if (!Array.isArray(p.tags) || !p.tags.length) err.push('缺 tags');
   if (!Array.isArray(p.hints)) err.push('缺 hints');
+  else if (p.hints.length < 2) err.push(`hints 只有 ${p.hints.length} 条, 分层提示要求每关 ≥2 条(第1条给方向, 靠后的才是关键做法)`);
+  else {
+    for (const h of p.hints) if (typeof h !== 'string' || !h.trim()) err.push('hints 存在空条目');
+    // 第 1 条不应是可直接照抄的做法 —— 仅告警, 不判失败(语言陷阱类提示含运算符是合理的)
+    if (/[;]|<=|>=|&&|\|\||>>>|>>|<<|\.equals\(|\.length\(\)/.test(p.hints[0])) {
+      console.log(`   ⚠️  ${tag} 第 1 条提示含代码特征, 建议把"做法"后移`);
+    }
+  }
 
   if (p.mode === 'design') {
     if (!p.entry || !p.entry.className) err.push('design 缺 entry.className');

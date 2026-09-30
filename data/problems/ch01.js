@@ -195,6 +195,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先想清楚：负数在 Java 里是补码，位运算作用在补码上，所以 n 为负时结果可能反直觉",
         "用 n & (n-1) 可以每次消掉最低位的 1"
       ]
     },
@@ -261,6 +262,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先把 0 与负数这两个边界单独处理，再考虑\"取余得到最低位、整除去掉最低位\"的循环",
         "返回 String 时判题直接按原样比较, 不要加引号"
       ]
     },
@@ -397,6 +399,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先用辗转相除法把 gcd 求出来；lcm 和 gcd 之间有一个乘积关系",
         "lcm = a / gcd * b, 先除后乘避免溢出"
       ]
     },
@@ -463,6 +466,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先固定你的区间定义（闭区间还是半开区间）和循环不变量，再动手写循环",
         "用 (lo+hi)>>>1 避免加法溢出"
       ]
     },
@@ -529,6 +533,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "两个指针各指一个数组，谁小取谁；注意其中一个先走完后剩下的要整段接上",
         "用 <= 保证稳定性, 结果长度是两数组长度之和"
       ]
     },
@@ -653,6 +658,7 @@ window.JQ_PROBLEMS.push({
         "ref": "public class Ref { public static int solve(int[] a){ int best=Integer.MIN_VALUE; for(int i=0;i<a.length;i++){ int s=0; for(int j=i;j<a.length;j++){ s+=a[j]; if(s>best) best=s; } } return best; } }"
       },
       "hints": [
+        "考虑\"以每个位置结尾的最大和\"，它只依赖前一个位置的结论，不需要回头重算",
         "全负数时答案是最大的那个负数, 不能初始化为 0"
       ]
     },
@@ -719,6 +725,7 @@ window.JQ_PROBLEMS.push({
         "ref": "public class Ref { public static int solve(int[] a, int k){ int[] b=a.clone(); for(int i=1;i<b.length;i++){ int v=b[i], j=i-1; while(j>=0 && b[j]>v){ b[j+1]=b[j]; j--; } b[j+1]=v; } return b[k-1]; } }"
       },
       "hints": [
+        "排序是最直接的解法；再想想能不能不把整个数组排完就找到答案",
         "注意 clone 原数组, 不要破坏入参"
       ]
     },
@@ -781,6 +788,7 @@ window.JQ_PROBLEMS.push({
         "ref": "public class Ref { public static long solve(int[] a){ long c=0; for(int i=0;i<a.length;i++) for(int j=i+1;j<a.length;j++) if(a[i]>a[j]) c++; return c; } }"
       },
       "hints": [
+        "O(n²) 在 n=1e5 会超时。把数组分成两半：逆序对来自左半、右半、以及跨越中点的三类",
         "相等元素不算逆序对, 归并时用 a[i] <= a[j]"
       ]
     },
@@ -929,6 +937,7 @@ window.JQ_PROBLEMS.push({
       "solution": "class Trie {\n    private static class Node { Node[] ch = new Node[26]; boolean end; }\n    private Node root = new Node();\n    public void insert(String w) { Node c = root; for (int i = 0; i < w.length(); i++) { int k = w.charAt(i) - 'a'; if (c.ch[k] == null) c.ch[k] = new Node(); c = c.ch[k]; } c.end = true; }\n    public boolean search(String w) { Node c = find(w); return c != null && c.end; }\n    public boolean startsWith(String p) { return find(p) != null; }\n    private Node find(String s) { Node c = root; for (int i = 0; i < s.length(); i++) { int k = s.charAt(i) - 'a'; if (c.ch[k] == null) return null; c = c.ch[k]; } return c; }\n}\n\npublic class Main { }\n",
       "tests": [],
       "hints": [
+        "每个节点代表一个字符，用数组或哈希表存它的孩子；插入就是逐字符往下走",
         "search 与 startsWith 的区别只在结束标记"
       ]
     },

@@ -986,6 +986,7 @@ window.JQ_PROBLEMS.push({
         "ref": "public class Ref { public static int solve(int a, int b){ return a+b; } }"
       },
       "hints": [
+        "先想清楚：二进制加法可以拆成\"不考虑进位的和\"与\"进位\"两部分，分别由哪两个位运算得到？",
         "a^b 是不进位和, (a&b)<<1 是进位, 反复迭代直到进位为 0",
         "int 的 << 自动丢弃高位, 天然实现 32 位回绕, 与参考实现一致"
       ]
@@ -1093,6 +1094,7 @@ window.JQ_PROBLEMS.push({
       "solution": "class BitSet32 {\n    private final long[] bits;\n    private int size = 0;\n    public BitSet32(int n) { bits = new long[(n + 63) >>> 6]; }\n    public void add(int v) {\n        int w = v >>> 6, b = v & 63;\n        if ((bits[w] & (1L << b)) == 0) { bits[w] |= (1L << b); size++; }\n    }\n    public void remove(int v) {\n        int w = v >>> 6, b = v & 63;\n        if ((bits[w] & (1L << b)) != 0) { bits[w] &= ~(1L << b); size--; }\n    }\n    public boolean contains(int v) { return (bits[v >>> 6] & (1L << (v & 63))) != 0; }\n    public int count() { return size; }\n    public String toString() {\n        StringBuilder sb = new StringBuilder();\n        for (int w = 0; w < bits.length; w++) {\n            long x = bits[w];\n            while (x != 0) {\n                int b = Long.numberOfTrailingZeros(x);\n                if (sb.length() > 0) sb.append(',');\n                sb.append(w * 64 + b);\n                x &= (x - 1);\n            }\n        }\n        return sb.toString();\n    }\n}\n\npublic class Main { }\n",
       "tests": [],
       "hints": [
+        "先选容器：一个 long 有 64 位，正好当 64 个布尔位用，比 boolean[] 省很多空间",
         "第 v 位落在 long 数组下标 v>>>6 的第 v&63 位上",
         "add 时要先判断该位是否已存在, 否则 size 会重复累加",
         "toString 按下标升序扫描即天然有序"

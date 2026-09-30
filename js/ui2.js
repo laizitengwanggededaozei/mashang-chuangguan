@@ -166,18 +166,25 @@
           <button onclick="JQ2UI.runSamples()">▶ 跑公开样例</button>
           <button onclick="JQ2UI.submit()" style="border-color:var(--gold);color:var(--gold)">🚀 提交评测</button>
           <button onclick="JQ2UI.resetCode()">↺ 恢复模板</button>
-          <button onclick="JQ2UI.showHint()">💡 提示</button>
+          <button onclick="JQ2UI.showHint()" id="hintbtn">💡 提示</button>
           <span id="runmsg" class="view-sub"></span>
         </div>
         <div id="verdict"></div>
       </div>
-      ${level.hints && level.hints.length ? `<div class="card" id="hintbox" style="display:none">
-        <b>💡 思路提示</b><div class="view-sub">${level.hints.map(h => '· ' + esc(h)).join('<br>')}</div></div>` : ''}`;
+      ${level.hints && level.hints.length ? `<div class="card" id="hintbox">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <b>💡 分层提示</b>
+          <span class="view-sub" id="hintmeta"></span>
+        </div>
+        <div id="hintlist" style="display:grid;gap:8px;margin-top:8px"></div>
+        <div class="view-sub" style="margin-top:8px">提示<b>由弱到强</b>排列：前几条只给方向，最后一条才点到关键做法。自己先试，卡住了再点。</div>
+      </div>` : ''}`;
     document.getElementById('codein').addEventListener('input', e => localStorage.setItem(draftKey, e.target.value));
     document.getElementById('codein').addEventListener('keydown', e => {
       if (e.key === 'Tab') { e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0, s) + '    ' + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 4; }
     });
     if (isBoss && !Q.save.solved[level.id]) startBossTimer(); else stopBossTimer();
+    renderHints(-1);   // 恢复本关已揭示的提示层级
     hud();
   };
 
@@ -292,7 +299,50 @@
   }
 
   Q.resetCode = function () { document.getElementById('codein').value = cur.level.starter || ''; localStorage.removeItem('jq2.draft.' + cur.level.id); };
-  Q.showHint = function () { const b = document.getElementById('hintbox'); if (b) b.style.display = b.style.display === 'none' ? '' : 'none'; };
+
+  // 分层提示: 逐级揭示, 已看条数写入存档(仅作透明度记录, 不惩罚)
+  const TIER_NAME = ['方向', '思路', '关键做法', '易错点', '补充'];
+  function renderHints(highlight) {
+    const level = cur && cur.level;
+    if (!level) return;
+    const hints = Q.hintsOf(level);
+    const seen = Q.hintsSeen(level);
+    const box = document.getElementById('hintbox');
+    const list = document.getElementById('hintlist');
+    const meta = document.getElementById('hintmeta');
+    const btn = document.getElementById('hintbtn');
+    if (!level.hints || !level.hints.length) {
+      if (btn) { btn.disabled = true; btn.textContent = '💡 本题无提示'; }
+      return;
+    }
+    if (meta) meta.textContent = `已看 ${seen}/${hints.length} 条`;
+    if (btn) {
+      if (seen >= hints.length) { btn.textContent = '💡 已显示全部提示'; btn.disabled = true; }
+      else { btn.textContent = `💡 提示 (${seen}/${hints.length})`; btn.disabled = false; }
+    }
+    if (list) {
+      let html = '';
+      for (let i = 0; i < hints.length; i++) {
+        if (i < seen) {
+          html += `<div class="hint-tier t${Math.min(i + 1, 3)}${i === highlight ? ' fresh' : ''}">
+            <b>提示 ${i + 1} · ${TIER_NAME[Math.min(i, TIER_NAME.length - 1)]}</b>
+            <div>${esc(hints[i])}</div></div>`;
+        } else {
+          html += `<div class="hint-tier locked">🔒 提示 ${i + 1} · 点上方「提示」按钮解锁</div>`;
+        }
+      }
+      list.innerHTML = html;
+    }
+    if (box) box.style.display = '';
+  }
+  Q.showHint = function () {
+    const level = cur && cur.level;
+    if (!level || !level.hints || !level.hints.length) return;
+    const r = Q.revealHint(level);
+    renderHints(r.justRevealed);
+    hud();
+  };
+  Q.renderHints = () => renderHints(-1);
 
   /* ------------------ 视图: 知识体系 / 战绩 ------------------ */
   const SYS = [
@@ -325,8 +375,10 @@
         <div class="stat"><b>${Q.solvedCount()}/${Q.totalCount()}</b><span>已通关</span></div>
         <div class="stat"><b>${esc(Q.title(s.xp))}</b><span>称号</span></div>
         <div class="stat"><b>${Q.badgeCount()}/${Q.BADGES.length}</b><span>成就徽章</span></div>
+        <div class="stat"><b>${Q.totalHintsSeen()}</b><span>查看提示</span></div>
       </div>
       ${Q.nextTitle(s.xp) ? `<div class="view-sub">下一称号「${esc(Q.nextTitle(s.xp).name)}」还需 ${Q.nextTitle(s.xp).need} XP</div>` : '<div class="view-sub">已达最高称号 🏆 JVM 之神</div>'}
+      <div class="view-sub">「查看提示」只作透明度记录，<b>不影响 XP 与徽章</b> —— 卡住时看提示比放弃更好。</div>
       </div>
       <div class="card"><b>🏅 成就徽章</b>
         <div class="badge-wall">

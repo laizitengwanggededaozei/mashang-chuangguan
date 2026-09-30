@@ -8,11 +8,12 @@
 
 | 项目 | 状态 |
 |---|---|
-| 版本 | v2.2（内容打磨完成） |
+| 版本 | v2.3（分层提示 + CI） |
 | 关卡 | 210 关 / 14 章（method 126 · stress 42 · design 42） |
 | 章节 BOSS | 14 个，全部具备「公开序列 + 隐藏边界序列」两阶段判定（隐藏序列共 181 步） |
 | 成就徽章 | 12 枚；称号 9 级 |
-| 自动验收 | **4 道护栏全绿**（详见第四节） |
+| 分层提示 | 每关 ≥2 条，**由弱到强逐级揭示**（方向 → 深入 → 关键做法），看提示不影响 XP |
+| 自动验收 | **4 道护栏**（详见第四节），已配置 GitHub Actions 在推送时自动运行 |
 | 许可证 | MIT |
 
 ---
@@ -71,9 +72,11 @@ node tools/serve.mjs 4319
 | # | 命令 | 覆盖 | 当前结果 |
 |---|---|---|---|
 | 1 | `node tools/judge-selftest.mjs` | 判题内核：判决矩阵 20 项 + 比较器 5 项 | ✅ 全部通过 |
-| 2 | `node tools/verify-problems.mjs data/problems/chNN.js` | 单章题库：schema / 顺序 / 隐藏用例 / starter 可编译 / **solution 必 AC** / 题面接口一致性 / 同章防重题 | ✅ 14/14 章 |
-| 3 | `node tools/ui-smoke.mjs` | 前端接线：stub DOM 跑地图渲染、开卡、提交、徽章解锁、BOSS 计时与阶段 | ✅ 全部通过 |
+| 2 | `node tools/verify-problems.mjs data/problems/chNN.js` | 单章题库：schema / 顺序 / 隐藏用例 / starter 可编译 / **solution 必 AC** / 题面接口一致性 / 同章防重题 / **提示 ≥2 条** / BOSS 双阶段 | ✅ 14/14 章 |
+| 3 | `node tools/ui-smoke.mjs` | 前端接线：stub DOM 跑地图渲染、开卡、提交、徽章解锁、BOSS 计时与阶段、**分层提示逐级揭示** | ✅ 全部通过 |
 | 4 | `node tools/e2e-check.mjs` | 端到端（需先启动服务）：题面契约、隐藏用例不泄露、公开样例隔离、畸形 URL、数据目录拦截等 8 项 | ✅ 全部通过 |
+
+**CI**：`.github/workflows/ci.yml` 在 push / PR 时自动跑这四道护栏 —— 护栏 1+3 一个 job，护栏 2 按 14 章矩阵并行，护栏 4 单独一个 job（自动起服务、跑完停掉）。
 
 另有一个可复用的内容体检工具：
 
@@ -91,12 +94,13 @@ node tools/content-audit.mjs   # 解法指纹比对 + 跨章接口签名统计 +
 mashang-chuangguan/
 ├─ index.html              游戏入口
 ├─ LICENSE                 MIT
+├─ .github/workflows/ci.yml  推送时自动跑四道护栏
 ├─ css/style.css           暗色 RPG 主题
 ├─ js/api.js               题库/判题接口客户端
-├─ js/engine2.js           进度、解锁门控、XP、称号、成就徽章、存档(javaQuest.v2.save)
-├─ js/ui2.js               关卡地图 / 编程界面 / 判决面板 / BOSS 面板 / 战绩
-├─ data/problems/chNN.js   14 章题库(每章 15 关, 含参考实现与隐藏用例)
-├─ docs/v2-重构设计书.md    需求拆解、问题诊断、架构设计与 v2.0→v2.2 迭代记录
+├─ js/engine2.js           进度、解锁门控、XP、称号、成就徽章、分层提示状态、存档
+├─ js/ui2.js               关卡地图 / 编程界面 / 判决面板 / BOSS 面板 / 提示阶梯 / 战绩
+├─ data/problems/chNN.js   14 章题库(每章 15 关, 含参考实现、隐藏用例与分层提示)
+├─ docs/v2-重构设计书.md    需求拆解、问题诊断、架构设计与 v2.0→v2.3 迭代记录
 ├─ CHANGELOG.md            版本时间线
 └─ tools/
    ├─ judge-core.mjs       评测内核(多模式 harness)
@@ -123,12 +127,28 @@ mashang-chuangguan/
 ## 六、存档
 
 进度保存在浏览器 `localStorage`，键为 `javaQuest.v2.save`；代码草稿按关保存为 `jq2.draft.<关卡id>`。
-存档字段：`solved / attempts / xp / badges / best / streak / boss`；旧档缺字段会自动补齐。
+存档字段：`solved / attempts / xp / badges / best / streak / boss / hintsSeen`；旧档缺字段会自动补齐。
 「🔄 重开」可重置全部进度与草稿。
 
 ---
 
-## 七、给后续出题者
+## 七、分层提示怎么用
+
+每关的提示**按由弱到强排列**，点一次「💡 提示」只揭示一级：
+
+| 层级 | 给什么 | 例子 |
+|---|---|---|
+| 提示 1 · 方向 | 只指方向或让你想清楚某个前提，**不给做法** | 「先固定你的区间定义和循环不变量，再动手写循环」 |
+| 提示 2..n-1 · 深入 | 拆解思路、指出结构选型 | 「把数组分成两半：逆序对来自左半、右半、跨越中点三类」 |
+| 最后一条 · 关键做法 | 才点到具体写法或公式 | 「lcm = a / gcd * b, 先除后乘避免溢出」 |
+
+- 已揭示的层级写入存档，**重新进入关卡仍然保留**；计数按关独立。
+- 战绩页显示「查看提示」累计数，**仅作透明度记录，不影响 XP 与徽章** —— 卡住时看提示比放弃更好。
+- 出题硬性要求：每关 `hints` **≥ 2 条**，由 `verify-problems.mjs` 强制校验。
+
+---
+
+## 八、给后续出题者
 
 先读 [题库规范v2.md](tools/题库规范v2.md)，再参照黄金样例 `data/problems/ch01.js`。新增/修改题库后必须自检：
 
@@ -139,7 +159,8 @@ node tools/content-audit.mjs      # 跨章比对(需要全局视野, 验证器�
 
 校验器会检查：schema、`order` 连续、每关用例数与隐藏用例、starter 可编译、**solution 必须 AC**、
 **题面声明的接口必须与判题实际调用的接口一致**（防止"按题面写却必然失败"的关卡）、
-同章标题与解法指纹不得重复、BOSS 必须具备公开+隐藏两组 `opSets`。
+同章标题与解法指纹不得重复、BOSS 必须具备公开+隐藏两组 `opSets`、每关 `hints` ≥ 2 条且第 1 条不含代码特征。
+
 
 ---
 
@@ -150,11 +171,11 @@ node tools/content-audit.mjs      # 跨章比对(需要全局视野, 验证器�
 | v2.0 | 重建内容与引擎 | 210 关全新题库（零问答题/零打印题）、四模式判题内核、隐藏用例、随机对拍 |
 | v2.1 | 补齐玩法层 | 12 枚成就徽章、BOSS 限时多阶段（14 条隐藏边界序列）、前端冒烟测试 |
 | v2.2 | 内容打磨 | 消除 5 处跨章同题、补强随机对拍覆盖面、新增防同题门禁 |
+| v2.3 | 分层提示 + CI | 提示改为逐级揭示、全库提示 ≥2 条并按由弱到强重排、GitHub Actions 自动跑四道护栏 |
 
 **已知待办（尚未实现，不要当成已完成）**：
 
-- **分层提示**：210 关的 `hints` 目前是 2–3 条平铺展示，尚未做「点一次给一级」的渐进式揭示。
-- **CI 接入**：四道护栏目前靠手动执行，尚未配置 GitHub Actions 在推送时自动运行。
+- 暂无 —— 原「分层提示」与「CI 接入」两项已在 v2.3 完成；CI 的首次真实运行结果见仓库 Actions 页。
 
 **仓库**：<https://github.com/laizitengwanggededaozei/mashang-chuangguan>（公开）
 

@@ -315,6 +315,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先分清实例字段与静态字段的生命周期差别：谁在每次调用后还留着值",
         "static 字段被所有调用共享, 所以每次进入方法都要重置, 否则第二次调用会接着上次的编号"
       ]
     },
@@ -775,6 +776,7 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
+        "先数清楚：5 个枚举常量各需要几位二进制才能互相区分？一个 int 一共能装下几组？",
         "编码用 code |= v << (3*i), 解码用 code & 7 逐组取出",
         "序数 5..7 在 3 位里能表示, 但枚举只有 5 个常量, 必须判越界"
       ]
@@ -847,6 +849,7 @@ window.JQ_PROBLEMS.push({
         "ref": "public class Ref { public static String solve(int[] a){ String s=\"\"; for(int i=0;i<a.length;i++){ if(i>0) s+=(char)124; s+=\"[\"+i+\":\"+a[i]+\"]\"; } return s; } }"
       },
       "hints": [
+        "先写出最直白的实现并跑公开样例，重点确认空输入与只有一个元素时的输出",
         "分隔符用 i > 0 判断, 避免开头或结尾多出竖线"
       ]
     },

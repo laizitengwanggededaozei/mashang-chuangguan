@@ -5,7 +5,7 @@
 
   const blank = () => ({
     solved: {}, attempts: {}, xp: 0, badges: [], best: {},
-    streak: { cur: 0, best: 0 }, boss: {}, createdAt: Date.now()
+    streak: { cur: 0, best: 0 }, boss: {}, hintsSeen: {}, createdAt: Date.now()
   });
 
   Q.load = function () {
@@ -71,6 +71,21 @@
     return Q.save.attempts[level.id];
   };
   Q.attemptsOf = level => Q.save.attempts[level.id] || 0;
+
+  // ---------- 分层提示 ----------
+  // 提示按"由弱到强"排列, 逐条揭示: 点一次给一级, 记录已看条数(不惩罚, 只做透明度)
+  Q.hintsOf = level => (level && level.hints) || [];
+  Q.hintsSeen = level => Math.min(Q.save.hintsSeen[level.id] || 0, Q.hintsOf(level).length);
+  Q.revealHint = function (level) {
+    const total = Q.hintsOf(level).length;
+    const cur = Q.hintsSeen(level);
+    if (cur >= total) return { seen: cur, total, done: true, justRevealed: -1 };
+    const next = cur + 1;
+    Q.save.hintsSeen[level.id] = next;
+    Q.persist();
+    return { seen: next, total, done: next >= total, justRevealed: cur };
+  };
+  Q.totalHintsSeen = () => Object.values(Q.save.hintsSeen).reduce((a, n) => a + (n || 0), 0);
 
   // 通关结算: 返回 {xp, firstTry, newBadges}
   Q.award = function (level, meta) {

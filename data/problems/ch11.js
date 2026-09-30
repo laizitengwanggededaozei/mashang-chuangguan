@@ -325,8 +325,9 @@ window.JQ_PROBLEMS.push({
         }
       ],
       "hints": [
-        "Comparator.comparingInt(r -> r[1]).reversed() 只反转当前这一段, 不要整体 reversed()",
+        "多级排序就是把若干个\"单键比较\"按优先级串起来，先写好每一级再拼接",
         "多级比较用 thenComparing 串起来, 先写好单键再拼接",
+        "Comparator.comparingInt(r -> r[1]).reversed() 只反转当前这一段, 不要整体 reversed()",
         "排序会改动数组, 建议先 clone 或用包装对象"
       ]
     },
