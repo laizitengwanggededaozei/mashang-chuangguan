@@ -1,5 +1,7 @@
 # 码上闯关 · JavaQuest v2 ☕ 编程闯关游戏
 
+[![CI](https://github.com/laizitengwanggededaozei/mashang-chuangguan/actions/workflows/ci.yml/badge.svg)](https://github.com/laizitengwanggededaozei/mashang-chuangguan/actions/workflows/ci.yml)
+
 > 中文名「**码上闯关**」（`码`谐音`马`，取自「马上闯关」）。
 > GitHub 仓库名不支持中文字符（实测会被清洗成一个 `-`），因此仓库名用拼音 **mashang-chuangguan**。
 
@@ -175,7 +177,8 @@ node tools/content-audit.mjs      # 跨章比对(需要全局视野, 验证器�
 
 **已知待办（尚未实现，不要当成已完成）**：
 
-- 暂无 —— 原「分层提示」与「CI 接入」两项已在 v2.3 完成；CI 的首次真实运行结果见仓库 Actions 页。
+- 暂无 —— 原「分层提示」与「CI 接入」两项已在 v2.3 完成。
+  CI 已实际运行两次均全绿（各 **16/16 job** 成功）：内核自测+前端冒烟、题库 14 章矩阵、端到端。
 
 **仓库**：<https://github.com/laizitengwanggededaozei/mashang-chuangguan>（公开）
 
