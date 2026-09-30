@@ -481,6 +481,8 @@ function readResult(resultPath) {
 export function judgeProblem(problem, code) {
   const limits = Object.assign({ timeMs: 3000, memMb: 256, stackKb: 16384 }, problem.limits || {});
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'jq2-'));
+  // 注意: 这里的 nonce 只用于让临时结果文件名唯一(避免并发判题互相覆盖),
+  // 不承担任何反作弊/防篡改职责 —— 本项目是学习用途, 不做沙箱隔离与防御性校验。
   const nonce = crypto.randomBytes(8).toString('hex');
   const resultPath = path.join(os.tmpdir(), 'jq2res-' + nonce + '.txt');
   const started = Date.now();
