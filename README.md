@@ -1,4 +1,7 @@
-# JavaQuest v2 ☕ 编程闯关游戏
+# 码上闯关 · JavaQuest v2 ☕ 编程闯关游戏
+
+> 中文名「**码上闯关**」（`码`谐音`马`，取自「马上闯关」）。
+> GitHub 仓库名不支持中文字符（实测会被清洗成一个 `-`），因此仓库名用拼音 **mashang-chuangguan**。
 
 面向 Java 初学者的**真编程闯关游戏**：14 章 × 15 关 = **210 道编程题**，全部由本机 JDK 真实编译运行评测。
 题库内容对齐黑马 Java 课程章节，但每章按「能力递进」重新设计，**没有一道选择题/填空题/打印题**。
@@ -19,8 +22,8 @@
 **环境要求**：Node.js ≥ 18（开发环境为 24）、**JDK 17 或更高**（开发环境为 21），且 `java` 与 `javac` 都在 `PATH` 上。
 
 ```bash
-git clone https://github.com/laizitengwanggededaozei/JavaQuest.git
-cd JavaQuest
+git clone https://github.com/laizitengwanggededaozei/mashang-chuangguan.git
+cd mashang-chuangguan
 node tools/serve.mjs 4319
 # 浏览器打开 http://127.0.0.1:4319
 ```
@@ -85,7 +88,7 @@ node tools/content-audit.mjs   # 解法指纹比对 + 跨章接口签名统计 +
 ## 五、目录结构
 
 ```
-java-quest/
+mashang-chuangguan/
 ├─ index.html              游戏入口
 ├─ LICENSE                 MIT
 ├─ css/style.css           暗色 RPG 主题
@@ -151,7 +154,9 @@ node tools/content-audit.mjs      # 跨章比对(需要全局视野, 验证器�
 **已知待办（尚未实现，不要当成已完成）**：
 
 - **分层提示**：210 关的 `hints` 目前是 2–3 条平铺展示，尚未做「点一次给一级」的渐进式揭示。
-- 仓库尚未推送到 GitHub（需先 `gh auth login`），本地提交已完成。
+- **CI 接入**：四道护栏目前靠手动执行，尚未配置 GitHub Actions 在推送时自动运行。
+
+**仓库**：<https://github.com/laizitengwanggededaozei/mashang-chuangguan>（公开）
 
 详细迭代过程、问题诊断与「自身犯过的错」记录见 [v2-重构设计书.md](docs/v2-重构设计书.md)。
 
